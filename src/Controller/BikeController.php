@@ -28,6 +28,7 @@ class BikeController extends AbstractController
                'id' => $product->getId(),
                'brand' => $product->getBrand(),
                'engine_size' => $product->getEngineSize(),
+               'color' => $product->getColor(),
            ];
         }
     
@@ -41,6 +42,7 @@ class BikeController extends AbstractController
         $bike = new Bike();
         $bike->setBrand($request->request->get('brand'));
         $bike->setEngineSize($request->request->get('engine_size'));
+        $bike->setColor($request->request->get('color'));
     
         $entityManager->persist($bike);
         $entityManager->flush();
@@ -49,6 +51,7 @@ class BikeController extends AbstractController
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
             'engine_size' => $bike->getEngineSize(),
+            'color' => $bike->getColor(),
         ];
             
         return $this->json($data);
@@ -69,6 +72,7 @@ class BikeController extends AbstractController
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
             'engine_size' => $bike->getEngineSize(),
+            'color' => $bike->getColor(),
         ];
             
         return $this->json($data);
@@ -93,12 +97,18 @@ public function update(EntityManagerInterface $entityManager, Request $request, 
         $bike->setEngineSize($engineSize);
     }
 
+    $color = $request->request->get('color');
+    if ($color !== null) {
+        $bike->setColor($color);
+    }
+
     $entityManager->flush();
 
     $data =  [
         'id' => $bike->getId(),
         'brand' => $bike->getBrand(),
         'engine_size' => $bike->getEngineSize(),
+        'color' => $bike->getColor(),
     ];
 
     return $this->json($data);
