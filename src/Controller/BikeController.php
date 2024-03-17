@@ -74,27 +74,36 @@ class BikeController extends AbstractController
         return $this->json($data);
     }
   
-    #[Route('/bikes/{id}', name: 'bike_update', methods:['put', 'patch'] )]
-    public function update(EntityManagerInterface $entityManager, Request $request, int $id): JsonResponse
-    {
-        $bike = $entityManager->getRepository(Bike::class)->find($id);
-    
-        if (!$bike) {
-            return $this->json('No bike found for id: ' . $id, 404);
-        }
-    
-        $bike->setBrand($request->request->get('brand'));
-        $bike->setEngineSize($request->request->get('engine_size'));
-        $entityManager->flush();
-    
-        $data =  [
-            'id' => $bike->getId(),
-            'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
-        ];
-            
-        return $this->json($data);
+#[Route('/bikes/{id}', name: 'bike_update', methods:['put', 'patch'] )]
+public function update(EntityManagerInterface $entityManager, Request $request, int $id): JsonResponse
+{
+    $bike = $entityManager->getRepository(Bike::class)->find($id);
+
+    if (!$bike) {
+        return $this->json('No bike found for id: ' . $id, 404);
     }
+
+    $brand = $request->request->get('brand');
+    if ($brand !== null) {
+        $bike->setBrand($brand);
+    }
+
+    $engineSize = $request->request->get('engine_size');
+    if ($engineSize !== null) {
+        $bike->setEngineSize($engineSize);
+    }
+
+    $entityManager->flush();
+
+    $data =  [
+        'id' => $bike->getId(),
+        'brand' => $bike->getBrand(),
+        'engine_size' => $bike->getEngineSize(),
+    ];
+
+    return $this->json($data);
+}
+
   
     #[Route('/bikes/{id}', name: 'bike_delete', methods:['delete'] )]
     public function delete(EntityManagerInterface $entityManager, int $id): JsonResponse
