@@ -11,6 +11,9 @@ use App\Entity\Bike;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Validation;
  
  
 #[Route('/api', name: 'api_')]
@@ -19,24 +22,37 @@ class BikeController extends AbstractController
     #[Route('/bikes', name: 'bike_index', methods:['get'] )]
     public function index(EntityManagerInterface $entityManager): JsonResponse
     {
-        
-        $products = $entityManager
-            ->getRepository(Bike::class)
-            ->findAll();
-    
-        $data = [];
-    
-        foreach ($products as $product) {
-           $data[] = [
-               'id' => $product->getId(),
-               'brand' => $product->getBrand(),
-               'engine_size' => $product->getEngineSize(),
-               'color' => $product->getColor(),
-           ];
+        try {
+            $products = $entityManager
+                ->getRepository(Bike::class)
+                ->findAll();
+
+            if ($products === null) {
+                throw new \RuntimeException('Found null pointer reference when trying to retrieve bikes.');
+            }
+
+            $data = [];
+
+            foreach ($products as $product) {
+                if ($product === null) {
+                    throw new \RuntimeException('Found null pointer reference when trying to retrieve bike details.');
+                }
+
+                $data[] = [
+                    'id' => $product->getId(),
+                    'brand' => $product->getBrand(),
+                    'engine_size' => $product->getEngineSize(),
+                    'color' => $product->getColor(),
+                ];
+            }
+
+            return $this->json($data);
+
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
         }
-    
-        return $this->json($data);
     }
+
   
   
     #[Route('/bikes', name: 'bike_create', methods:['post'] )]
@@ -46,19 +62,19 @@ class BikeController extends AbstractController
         $bike->setBrand($request->request->get('brand'));
         $bike->setEngineSize($request->request->get('engine_size'));
         $bike->setColor($request->request->get('color'));
-    
-        $entityManager->persist($bike);
-        $entityManager->flush();
-    
-        $data =  [
-            'id' => $bike->getId(),
-            'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
-            'color' => $bike->getColor(),
-        ];
-            
-        return $this->json($data);
-    }
+
+    $entityManager->persist($bike);
+    $entityManager->flush();
+
+    $data =  [
+        'id' => $bike->getId(),
+        'brand' => $bike->getBrand(),
+        'engine_size' => $bike->getEngineSize(),
+        'color' => $bike->getColor(),
+    ];
+
+    return $this->json($data);
+}
   
   
     #[Route('/bikes/{id}', name: 'bike_show', methods:['get'] )]
@@ -131,5 +147,9 @@ public function update(EntityManagerInterface $entityManager, Request $request, 
         $entityManager->flush();
     
         return $this->json('Deleted successfully the bike with id: ' . $id);
-    }
+    } 
+
 }
+
+
+  
