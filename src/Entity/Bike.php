@@ -17,18 +17,19 @@ class Bike
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Brand cannot be empty.')]
-    #[Assert\Length(min: 2, max: 20)]
+    #[Assert\Length(min: 2, max: 50, minMessage:'Brand length must be at least {{ limit }} characters long', maxMessage:'Brand length must not exceed {{ limit }} characters.')]
     private ?string $Brand = null;
 
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Engine Size cannot be empty.')]
     #[Assert\Type(type: 'integer', message: 'Engine size must be a number.')]
-    #[Assert\Positive]
+    #[Assert\Positive(message: 'Engine Size cannot be negative.')]
     private ?int $EngineSize = null;
 
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(min: 2, max: 50)]
     private ?string $Color = null;
 
     public function getId(): ?int

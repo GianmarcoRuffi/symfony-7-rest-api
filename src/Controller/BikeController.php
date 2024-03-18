@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\HttpFoundation\Response;
 
 
 #[Route('/api', name: 'api_')]
@@ -55,19 +56,10 @@ class BikeController extends AbstractController
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
     public function create(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator): JsonResponse
     {
-        if (empty($request->request->get('brand')) && empty($request->request->get('engine_size'))) {
-            return $this->json(['error' => 'Missing the mandatory fields in the request'], 400);
-        }
 
         $brand = $request->request->get('brand');
         $engineSize = $request->request->get('engine_size');
-        if (!is_numeric($engineSize)) {
-            return $this->json(['error' => 'Engine size must be a number'], 400);
-        }
         $color = $request->request->get('color');
-        if (empty($color)) {
-            $color = 'Not specified';
-        }
 
         $bike = new Bike();
         $bike->setBrand($brand);
@@ -165,7 +157,7 @@ class BikeController extends AbstractController
         $bike = $entityManager->getRepository(Bike::class)->find($id);
 
         if (!$bike) {
-            return $this->json('No bike found for id: ' . $id, 404);
+             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
         $brand = $bike->getBrand();
         $entityManager->remove($bike);
