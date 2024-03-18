@@ -111,44 +111,53 @@ class BikeController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/bikes/{id}', name: 'bike_update', methods: ['put', 'patch'])]
-    public function update(EntityManagerInterface $entityManager, Request $request, int $id): JsonResponse
-    {
-        $bike = $entityManager->getRepository(Bike::class)->find($id);
 
-        if (!$bike) {
-            return $this->json('No bike found for id: ' . $id, 404);
-        }
+#[Route('/bikes/{id}', name: 'bike_update', methods: ['put', 'patch'])]
+public function update(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator, int $id): JsonResponse
+{
+    $bike = $entityManager->getRepository(Bike::class)->find($id);
 
-        $brand = $request->request->get('brand');
-        if ($brand !== null && $brand !== '') {
-            $bike->setBrand($brand);
-        }
-
-        $engineSize = $request->request->get('engine_size');
-        if ($engineSize !== null && $engineSize !== '') {
-            if (!is_numeric($engineSize)) {
-                return $this->json(['error' => 'Engine size must be a number'], 400);
-            }
-            $bike->setEngineSize($engineSize);
-        }
-
-        $color = $request->request->get('color');
-        if ($color !== null && $color !== '') {
-            $bike->setColor($color);
-        }
-
-        $entityManager->flush();
-
-        $data =  [
-            'id' => $bike->getId(),
-            'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
-            'color' => $bike->getColor(),
-        ];
-
-        return $this->json($data);
+    if (!$bike) {
+        return $this->json('No bike found for id: ' . $id, 404);
     }
+
+    $brand = $request->request->get('brand');
+    $engineSize = $request->request->get('engine_size');
+    $color = $request->request->get('color');
+
+    if ($brand !== null) {
+        $bike->setBrand($brand);
+    }
+
+    if ($engineSize !== null) {
+        $bike->setEngineSize((int)$engineSize);
+    }
+
+    if ($color !== null) {
+        $bike->setColor($color);
+    }
+
+    $errors = $validator->validate($bike);
+
+    if (count($errors) > 0) {
+        $errorMessages = [];
+        foreach ($errors as $error) {
+            $errorMessages[] = $error->getMessage();
+        }
+        return $this->json(['errors' => $errorMessages], 400);
+    }
+
+    $entityManager->flush();
+
+    $data =  [
+        'id' => $bike->getId(),
+        'brand' => $bike->getBrand(),
+        'engine_size' => $bike->getEngineSize(),
+        'color' => $bike->getColor(),
+    ];
+
+    return $this->json($data);
+}
 
 
     #[Route('/bikes/{id}', name: 'bike_delete', methods: ['delete'])]
@@ -157,7 +166,7 @@ class BikeController extends AbstractController
         $bike = $entityManager->getRepository(Bike::class)->find($id);
 
         if (!$bike) {
-             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+            return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
         $brand = $bike->getBrand();
         $entityManager->remove($bike);
