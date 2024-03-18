@@ -38,7 +38,7 @@ class BikeController extends AbstractController
                 $data[] = [
                     'id' => $product->getId(),
                     'brand' => $product->getBrand(),
-                    'engine_size' => $product->getEngineSize(),
+                    'engine_serial' => $product->getEngineSerial(),
                     'color' => $product->getColor(),
                 ];
             }
@@ -54,16 +54,16 @@ class BikeController extends AbstractController
     {
 
         $brand = $request->request->get('brand');
-        $engineSize = $request->request->get('engine_size');
+        $engineSerial = $request->request->get('engine_serial');
         $color = $request->request->get('color');
 
-           if ($brand === null || $engineSize === null) {
+           if ($brand === null || $engineSerial === null || $color === null) {
         return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
     }
 
         $bike = new Bike();
         $bike->setBrand($brand);
-        $bike->setEngineSize((int)$engineSize);
+        $bike->setEngineSerial($engineSerial);
         $bike->setColor($color);
 
         $errors = $validator->validate($bike);
@@ -83,7 +83,7 @@ class BikeController extends AbstractController
         $data =  [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
+            'engine_serial' => $bike->getEngineSerial(),
             'color' => $bike->getColor(),
         ];
 
@@ -104,7 +104,7 @@ class BikeController extends AbstractController
         $data =  [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
+            'engine_serial' => $bike->getEngineSerial(),
             'color' => $bike->getColor(),
         ];
 
@@ -122,15 +122,15 @@ class BikeController extends AbstractController
         }
 
         $brand = $request->request->get('brand');
-        $engineSize = $request->request->get('engine_size');
+        $engineSerial = $request->request->get('engine_serial');
         $color = $request->request->get('color');
 
         if ($brand !== null) {
             $bike->setBrand($brand);
         }
 
-        if ($engineSize !== null) {
-            $bike->setEngineSize((int)$engineSize);
+        if ($engineSerial !== null) {
+            $bike->setEngineSerial($engineSerial);
         }
 
         if ($color !== null) {
@@ -152,7 +152,7 @@ class BikeController extends AbstractController
         $data =  [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_size' => $bike->getEngineSize(),
+            'engine_serial' => $bike->getEngineSerial(),
             'color' => $bike->getColor(),
         ];
 

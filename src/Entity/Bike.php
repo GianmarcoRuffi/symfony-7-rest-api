@@ -21,15 +21,15 @@ class Bike
     private ?string $Brand = null;
 
 
-    #[ORM\Column(nullable: false)]
-    #[Assert\NotBlank(message: 'Engine Size cannot be empty.')]
-    #[Assert\Type(type: 'integer', message: 'Engine size must be a number.')]
-    #[Assert\Positive(message: 'Engine Size cannot be negative.')]
-    private ?int $EngineSize = null;
+    #[ORM\Column(name: "engine_serial",length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'Engine Serial cannot be empty.')]
+    #[Assert\Length(min: 5, max: 50, minMessage: 'Engine Serial length must be at least {{ limit }} characters long', maxMessage: 'Engine Serial length must not exceed {{ limit }} characters.')]
+    private ?string $EngineSerial = null;
 
 
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(min: 2, max: 50)]
+    #[ORM\Column(length: 50, nullable: false)]
+    #[Assert\NotBlank(message: 'Color cannot be empty.')]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Color text length must be at least {{ limit }} characters long', maxMessage: 'Color text length must not exceed {{ limit }} characters.')]
     private ?string $Color = null;
 
     public function getId(): ?int
@@ -49,14 +49,14 @@ class Bike
         return $this;
     }
 
-    public function getEngineSize(): ?int
+    public function getEngineSerial(): ?string
     {
-        return $this->EngineSize;
+        return $this->EngineSerial;
     }
 
-    public function setEngineSize(int $EngineSize): static
+    public function setEngineSerial(string $EngineSerial): static
     {
-        $this->EngineSize = $EngineSize;
+        $this->EngineSerial = $EngineSerial;
 
         return $this;
     }
