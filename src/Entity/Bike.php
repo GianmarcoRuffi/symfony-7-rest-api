@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\BikeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BikeRepository::class)]
 class Bike
@@ -13,14 +14,22 @@ class Bike
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    
+   #[ORM\Column(length: 50)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 20)]
     private ?string $Brand = null;
 
-    #[ORM\Column]
-    private ?int $EngineSize = null;
-
+    
+     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\Type(type: 'integer', message: 'Must be an integer.')]
+    #[Assert\Positive]
+      private ?int $EngineSize = null;
+    
+    
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $Color = null;
+     private ?string $Color = null;
 
     public function getId(): ?int
     {
@@ -63,3 +72,4 @@ class Bike
         return $this;
     }
 }
+
