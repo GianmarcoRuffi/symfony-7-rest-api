@@ -61,6 +61,10 @@ class BikeController extends AbstractController
         $engineSize = $request->request->get('engine_size');
         $color = $request->request->get('color');
 
+           if ($brand === null || $engineSize === null) {
+        return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
+    }
+
         $bike = new Bike();
         $bike->setBrand($brand);
         $bike->setEngineSize((int)$engineSize);

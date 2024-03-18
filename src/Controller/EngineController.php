@@ -43,11 +43,22 @@ class EngineController extends AbstractController
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
+        $name = $request->request->get('name');
+        $serialCode = $request->request->get('serial_code');
+        $horsepower = $request->request->get('horsepower');
+        $manufacturer = $request->request->get('manufacturer');
+
+
+        if ($name === null || $serialCode === null || $horsepower === null || $manufacturer === null) {
+            return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
+        }
+
+
         $engine = new Engine();
-        $engine->setName($request->request->get('name'));
-        $engine->setSerialCode($request->request->get('serial_code'));
-        $engine->setHorsepower((int)$request->request->get('horsepower'));
-        $engine->setManufacturer($request->request->get('manufacturer'));
+        $engine->setName($name);
+        $engine->setSerialCode($serialCode);
+        $engine->setHorsepower((int)$horsepower);
+        $engine->setManufacturer($manufacturer);
 
         $errors = $validator->validate($engine);
 

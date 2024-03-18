@@ -15,13 +15,13 @@ class Bike
     private ?int $id = null;
 
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: false)]
     #[Assert\NotBlank(message: 'Brand name cannot be empty.')]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Brand name length must be at least {{ limit }} characters long', maxMessage: 'Brand name length must not exceed {{ limit }} characters.')]
     private ?string $Brand = null;
 
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: false)]
     #[Assert\NotBlank(message: 'Engine Size cannot be empty.')]
     #[Assert\Type(type: 'integer', message: 'Engine size must be a number.')]
     #[Assert\Positive(message: 'Engine Size cannot be negative.')]
