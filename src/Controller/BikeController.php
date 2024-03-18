@@ -55,8 +55,8 @@ class BikeController extends AbstractController
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
     public function create(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator): JsonResponse
     {
-        if (!$request->request->has('brand') || !$request->request->has('engine_size') || !$request->request->has('color')) {
-            return $this->json(['error' => 'Missing required data in the request'], 400);
+        if (empty($request->request->get('brand')) && empty($request->request->get('engine_size'))) {
+            return $this->json(['error' => 'Missing the mandatory fields in the request'], 400);
         }
 
         $brand = $request->request->get('brand');

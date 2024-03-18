@@ -14,22 +14,22 @@ class Bike
     #[ORM\Column]
     private ?int $id = null;
 
-    
-   #[ORM\Column(length: 50)]
-    #[Assert\NotBlank]
+
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Brand cannot be empty.')]
     #[Assert\Length(min: 2, max: 20)]
     private ?string $Brand = null;
 
-    
-     #[ORM\Column]
-    #[Assert\NotBlank]
-    #[Assert\Type(type: 'integer', message: 'Must be an integer.')]
+
+    #[ORM\Column]
+    #[Assert\NotBlank(message: 'Engine Size cannot be empty.')]
+    #[Assert\Type(type: 'integer', message: 'Engine size must be a number.')]
     #[Assert\Positive]
-      private ?int $EngineSize = null;
-    
-    
+    private ?int $EngineSize = null;
+
+
     #[ORM\Column(length: 50, nullable: true)]
-     private ?string $Color = null;
+    private ?string $Color = null;
 
     public function getId(): ?int
     {
@@ -72,4 +72,3 @@ class Bike
         return $this;
     }
 }
-
