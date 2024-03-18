@@ -112,52 +112,52 @@ class BikeController extends AbstractController
     }
 
 
-#[Route('/bikes/{id}', name: 'bike_update', methods: ['put', 'patch'])]
-public function update(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator, int $id): JsonResponse
-{
-    $bike = $entityManager->getRepository(Bike::class)->find($id);
+    #[Route('/bikes/{id}', name: 'bike_update', methods: ['put', 'patch'])]
+    public function update(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator, int $id): JsonResponse
+    {
+        $bike = $entityManager->getRepository(Bike::class)->find($id);
 
-    if (!$bike) {
-        return $this->json('No bike found for id: ' . $id, 404);
-    }
-
-    $brand = $request->request->get('brand');
-    $engineSize = $request->request->get('engine_size');
-    $color = $request->request->get('color');
-
-    if ($brand !== null) {
-        $bike->setBrand($brand);
-    }
-
-    if ($engineSize !== null) {
-        $bike->setEngineSize((int)$engineSize);
-    }
-
-    if ($color !== null) {
-        $bike->setColor($color);
-    }
-
-    $errors = $validator->validate($bike);
-
-    if (count($errors) > 0) {
-        $errorMessages = [];
-        foreach ($errors as $error) {
-            $errorMessages[] = $error->getMessage();
+        if (!$bike) {
+            return $this->json('No bike found for id: ' . $id, 404);
         }
-        return $this->json(['errors' => $errorMessages], 400);
+
+        $brand = $request->request->get('brand');
+        $engineSize = $request->request->get('engine_size');
+        $color = $request->request->get('color');
+
+        if ($brand !== null) {
+            $bike->setBrand($brand);
+        }
+
+        if ($engineSize !== null) {
+            $bike->setEngineSize((int)$engineSize);
+        }
+
+        if ($color !== null) {
+            $bike->setColor($color);
+        }
+
+        $errors = $validator->validate($bike);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return $this->json(['errors' => $errorMessages], 400);
+        }
+
+        $entityManager->flush();
+
+        $data =  [
+            'id' => $bike->getId(),
+            'brand' => $bike->getBrand(),
+            'engine_size' => $bike->getEngineSize(),
+            'color' => $bike->getColor(),
+        ];
+
+        return $this->json($data);
     }
-
-    $entityManager->flush();
-
-    $data =  [
-        'id' => $bike->getId(),
-        'brand' => $bike->getBrand(),
-        'engine_size' => $bike->getEngineSize(),
-        'color' => $bike->getColor(),
-    ];
-
-    return $this->json($data);
-}
 
 
     #[Route('/bikes/{id}', name: 'bike_delete', methods: ['delete'])]

@@ -16,8 +16,8 @@ class Bike
 
 
     #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: 'Brand cannot be empty.')]
-    #[Assert\Length(min: 2, max: 50, minMessage:'Brand length must be at least {{ limit }} characters long', maxMessage:'Brand length must not exceed {{ limit }} characters.')]
+    #[Assert\NotBlank(message: 'Brand name cannot be empty.')]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Brand name length must be at least {{ limit }} characters long', maxMessage: 'Brand name length must not exceed {{ limit }} characters.')]
     private ?string $Brand = null;
 
 
