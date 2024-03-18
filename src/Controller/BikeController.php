@@ -52,8 +52,6 @@ class BikeController extends AbstractController
         }
     }
 
-
-
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
     public function create(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator): JsonResponse
     {
@@ -66,10 +64,10 @@ class BikeController extends AbstractController
         if (!is_numeric($engineSize)) {
             return $this->json(['error' => 'Engine size must be a number'], 400);
         }
-           $color = $request->request->get('color');
-    if (empty($color)) {
-        $color = 'Not specified';
-    }
+        $color = $request->request->get('color');
+        if (empty($color)) {
+            $color = 'Not specified';
+        }
 
         $bike = new Bike();
         $bike->setBrand($brand);
@@ -131,17 +129,20 @@ class BikeController extends AbstractController
         }
 
         $brand = $request->request->get('brand');
-        if ($brand !== null) {
+        if ($brand !== null && $brand !== '') {
             $bike->setBrand($brand);
         }
 
         $engineSize = $request->request->get('engine_size');
-        if ($engineSize !== null) {
+        if ($engineSize !== null && $engineSize !== '') {
+            if (!is_numeric($engineSize)) {
+                return $this->json(['error' => 'Engine size must be a number'], 400);
+            }
             $bike->setEngineSize($engineSize);
         }
 
         $color = $request->request->get('color');
-        if ($color !== null) {
+        if ($color !== null && $color !== '') {
             $bike->setColor($color);
         }
 
@@ -166,10 +167,10 @@ class BikeController extends AbstractController
         if (!$bike) {
             return $this->json('No bike found for id: ' . $id, 404);
         }
-
+        $brand = $bike->getBrand();
         $entityManager->remove($bike);
         $entityManager->flush();
 
-        return $this->json('Deleted successfully the bike with id: ' . $id);
+        return $this->json('The ' . $brand . ' bike with the id ' . $id . ' has been successfully deleted');
     }
 }
