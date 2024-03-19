@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EngineRepository::class)]
 #[ORM\Index(columns: ['serial_code'], name: 'engine_serial_code_idx')]
-#[UniqueEntity(fields: ["SerialCode"], message: 'There is already an engine with this serial code.')]
+#[UniqueEntity(fields: ["SerialCode"], message: 'An engine already exists with this serial code.')]
 
 class Engine
 {
