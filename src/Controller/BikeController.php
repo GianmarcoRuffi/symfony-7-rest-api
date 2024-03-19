@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Bike;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Response;
 
 
 #[Route('/api', name: 'api_')]
