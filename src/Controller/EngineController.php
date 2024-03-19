@@ -26,7 +26,7 @@ class EngineController extends AbstractController
 
             foreach ($engines as $engine) {
                 $data[] = [
-                    'id' => $engine->getId(),
+                    'id' => $engine->getSerialCode(),
                     'name' => $engine->getName(),
                     'serial_code' => $engine->getSerialCode(),
                     'horsepower' => $engine->getHorsepower(),
@@ -44,7 +44,7 @@ class EngineController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $name = $request->request->get('name');
-        $serialCode = $request->request->get('serial_code');
+        $serialCode = $request->request->get('serial_code'); // Utilizzare serial_code
         $horsepower = $request->request->get('horsepower');
         $manufacturer = $request->request->get('manufacturer');
 
@@ -56,7 +56,7 @@ class EngineController extends AbstractController
 
         $engine = new Engine();
         $engine->setName($name);
-        $engine->setSerialCode($serialCode);
+        $engine->setSerialCode($serialCode); // Utilizzare serial_code
         $engine->setHorsepower((int)$horsepower);
         $engine->setManufacturer($manufacturer);
 
@@ -74,7 +74,7 @@ class EngineController extends AbstractController
         $entityManager->flush();
 
         return $this->json([
-            'id' => $engine->getId(),
+            'id' => $engine->getSerialCode(),
             'name' => $engine->getName(),
             'serial_code' => $engine->getSerialCode(),
             'horsepower' => $engine->getHorsepower(),
@@ -82,17 +82,17 @@ class EngineController extends AbstractController
         ]);
     }
 
-    #[Route('/engines/{id}', name: 'engine_show', methods: ['GET'])]
-    public function show(EntityManagerInterface $entityManager, int $id): JsonResponse
+    #[Route('/engines/{serial_code}', name: 'engine_show', methods: ['GET'])]
+    public function show(EntityManagerInterface $entityManager, string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->find($id);
+        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
 
         if (!$engine) {
-            return $this->json('No engine found for id: ' . $id, 404);
+            return $this->json('No engine found for serial code: ' . $serial_code, 404);
         }
 
         return $this->json([
-            'id' => $engine->getId(),
+            'id' => $engine->getSerialCode(),
             'name' => $engine->getName(),
             'serial_code' => $engine->getSerialCode(),
             'horsepower' => $engine->getHorsepower(),
@@ -100,13 +100,13 @@ class EngineController extends AbstractController
         ]);
     }
 
-    #[Route('/engines/{id}', name: 'engine_update', methods: ['PUT', 'PATCH'])]
-    public function update(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, int $id): JsonResponse
+    #[Route('/engines/{serial_code}', name: 'engine_update', methods: ['PUT', 'PATCH'])]
+    public function update(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->find($id);
+        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
 
         if (!$engine) {
-            return $this->json('No engine found for id: ' . $id, 404);
+            return $this->json('No engine found for serial code: ' . $serial_code, 404);
         }
 
         $engine->setName($request->request->get('name', $engine->getName()));
@@ -127,7 +127,7 @@ class EngineController extends AbstractController
         $entityManager->flush();
 
         return $this->json([
-            'id' => $engine->getId(),
+            'id' => $engine->getSerialCode(),
             'name' => $engine->getName(),
             'serial_code' => $engine->getSerialCode(),
             'horsepower' => $engine->getHorsepower(),
@@ -135,18 +135,18 @@ class EngineController extends AbstractController
         ]);
     }
 
-    #[Route('/engines/{id}', name: 'engine_delete', methods: ['DELETE'])]
-    public function delete(EntityManagerInterface $entityManager, int $id): JsonResponse
+    #[Route('/engines/{serial_code}', name: 'engine_delete', methods: ['DELETE'])]
+    public function delete(EntityManagerInterface $entityManager, string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->find($id);
+        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
 
         if (!$engine) {
-            return $this->json('No engine found for id: ' . $id, 404);
+            return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
 
         $entityManager->remove($engine);
         $entityManager->flush();
 
-        return $this->json('The engine with id ' . $id . ' has been successfully deleted');
+        return $this->json('The engine with serial code ' . $serial_code . ' has been successfully deleted');
     }
 }

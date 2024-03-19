@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Bike;
+use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,26 +21,20 @@ class BikeController extends AbstractController
     public function index(EntityManagerInterface $entityManager): JsonResponse
     {
         try {
-            $products = $entityManager
-                ->getRepository(Bike::class)
-                ->findAll();
-
-            if ($products === null) {
-                throw new \RuntimeException('Found null pointer reference when trying to retrieve bikes.');
-            }
+            $bikes = $entityManager->getRepository(Bike::class)->findAll();
 
             $data = [];
-
-            foreach ($products as $product) {
-                if ($product === null) {
-                    throw new \RuntimeException('Found null pointer reference when trying to retrieve bike details.');
-                }
-
+            foreach ($bikes as $bike) {
                 $data[] = [
-                    'id' => $product->getId(),
-                    'brand' => $product->getBrand(),
-                    'engine_serial' => $product->getEngineSerial(),
-                    'color' => $product->getColor(),
+                    'id' => $bike->getId(),
+                    'brand' => $bike->getBrand(),
+                    'engine' => [
+                        'name' => $bike->getEngine()->getName(),
+                        'serial_code' => $bike->getEngine()->getSerialCode(),
+                        'manufacturer' => $bike->getEngine()->getManufacturer(),
+                        'horsepower' => $bike->getEngine()->getHorsepower(),
+                    ],
+                    'color' => $bike->getColor(),
                 ];
             }
 
@@ -52,24 +47,24 @@ class BikeController extends AbstractController
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
     public function create(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator): JsonResponse
     {
-
         $brand = $request->request->get('brand');
-        $engineSerial = $request->request->get('engine_serial');
         $color = $request->request->get('color');
+        $engineSerial = $request->request->get('engine_serial');
 
-           if ($brand === null || $engineSerial === null || $color === null) {
-        return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
-    }
+        if ($brand === null || $color === null || $engineSerial === null) {
+            return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
+        }
+
+        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $engineSerial]);
 
         $bike = new Bike();
         $bike->setBrand($brand);
-        $bike->setEngineSerial($engineSerial);
         $bike->setColor($color);
+        $bike->setEngine($engine);
 
         $errors = $validator->validate($bike);
 
         if (count($errors) > 0) {
-
             $errorMessages = [];
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
@@ -80,10 +75,15 @@ class BikeController extends AbstractController
         $entityManager->persist($bike);
         $entityManager->flush();
 
-        $data =  [
+        $data = [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_serial' => $bike->getEngineSerial(),
+            'engine' => [
+                'name' => $bike->getEngine()->getName(),
+                'serial_code' => $bike->getEngine()->getSerialCode(),
+                'manufacturer' => $bike->getEngine()->getManufacturer(),
+                'horsepower' => $bike->getEngine()->getHorsepower(),
+            ],
             'color' => $bike->getColor(),
         ];
 
@@ -97,14 +97,18 @@ class BikeController extends AbstractController
         $bike = $entityManager->getRepository(Bike::class)->find($id);
 
         if (!$bike) {
-
             return $this->json('No bike found for id: ' . $id, 404);
         }
 
-        $data =  [
+        $data = [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_serial' => $bike->getEngineSerial(),
+            'engine' => [
+                'name' => $bike->getEngine()->getName(),
+                'serial_code' => $bike->getEngine()->getSerialCode(),
+                'manufacturer' => $bike->getEngine()->getManufacturer(),
+                'horsepower' => $bike->getEngine()->getHorsepower(),
+            ],
             'color' => $bike->getColor(),
         ];
 
@@ -122,22 +126,26 @@ class BikeController extends AbstractController
         }
 
         $brand = $request->request->get('brand');
-        $engineSerial = $request->request->get('engine_serial');
         $color = $request->request->get('color');
+        $engineSerial = $request->request->get('engine_serial');
 
         if ($brand !== null) {
             $bike->setBrand($brand);
         }
-
-        if ($engineSerial !== null) {
-            $bike->setEngineSerial($engineSerial);
-        }
-
         if ($color !== null) {
             $bike->setColor($color);
         }
+        if ($engineSerial !== null) {
+
+            $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $engineSerial]);
+
+
+            $bike->setEngine($engine);
+        }
+
 
         $errors = $validator->validate($bike);
+
 
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -147,12 +155,19 @@ class BikeController extends AbstractController
             return $this->json(['errors' => $errorMessages], 400);
         }
 
+
         $entityManager->flush();
 
-        $data =  [
+
+        $data = [
             'id' => $bike->getId(),
             'brand' => $bike->getBrand(),
-            'engine_serial' => $bike->getEngineSerial(),
+            'engine' => [
+                'name' => $bike->getEngine()->getName(),
+                'serial_code' => $bike->getEngine()->getSerialCode(),
+                'manufacturer' => $bike->getEngine()->getManufacturer(),
+                'horsepower' => $bike->getEngine()->getHorsepower(),
+            ],
             'color' => $bike->getColor(),
         ];
 
@@ -168,7 +183,9 @@ class BikeController extends AbstractController
         if (!$bike) {
             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
+
         $brand = $bike->getBrand();
+
         $entityManager->remove($bike);
         $entityManager->flush();
 

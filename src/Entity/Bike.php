@@ -21,10 +21,10 @@ class Bike
     private ?string $Brand = null;
 
 
-    #[ORM\Column(name: 'engine_serial',length: 255, nullable: false)]
-    #[Assert\NotBlank(message: 'Engine Serial cannot be empty.')]
-    #[Assert\Length(min: 5, max: 50, minMessage: 'Engine Serial length must be at least {{ limit }} characters long', maxMessage: 'Engine Serial length must not exceed {{ limit }} characters.')]
-    private ?string $EngineSerial = null;
+    #[ORM\ManyToOne(targetEntity: Engine::class)]
+    #[Assert\NotBlank(message: 'You must indicate an existing serial.')]
+    #[ORM\JoinColumn(name: "engine_serial", referencedColumnName: "serial_code")]
+    private $engine;
 
 
     #[ORM\Column(length: 50, nullable: false)]
@@ -49,17 +49,18 @@ class Bike
         return $this;
     }
 
-    public function getEngineSerial(): ?string
+    public function getEngine(): ?Engine
     {
-        return $this->EngineSerial;
+        return $this->engine;
     }
 
-    public function setEngineSerial(string $EngineSerial): static
+    public function setEngine(?Engine $engine): self
     {
-        $this->EngineSerial = $EngineSerial;
+        $this->engine = $engine;
 
         return $this;
     }
+
 
     public function getColor(): ?string
     {

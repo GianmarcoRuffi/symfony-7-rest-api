@@ -8,26 +8,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EngineRepository::class)]
-#[ORM\Index(columns: ['serial_code'], name: 'engine_serial_code_idx')]
+#[ORM\Table(name: "engine")]
 #[UniqueEntity(fields: ["SerialCode"], message: 'An engine already exists with this serial code.')]
 
 class Engine
 {
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(name: "serial_code", length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'Serial Code is mandatory.')]
+    #[Assert\Length(min: 5, max: 255, minMessage: 'Serial Code length must be at least {{ limit }} characters long', maxMessage: 'Serial Code length must not exceed {{ limit }} characters.')]
+    private ?string $SerialCode = null;
 
     #[ORM\Column(length: 50, nullable: false)]
     #[Assert\NotBlank(message: 'Name cannot be empty.')]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Name length must be at least {{ limit }} characters long', maxMessage: 'Name length must not exceed {{ limit }} characters.')]
     private ?string $Name = null;
-
-    #[ORM\Column(length: 255, nullable: false)]
-    #[Assert\NotBlank(message: 'Serial Code is mandatory.')]
-    #[Assert\Length(min: 5, max: 255, minMessage: 'Serial Code length must be at least {{ limit }} characters long', maxMessage: 'Serial Code length must not exceed {{ limit }} characters.')]
-    private ?string $SerialCode = null;
 
     #[ORM\Column(nullable: false)]
     #[Assert\NotBlank(message: 'Horsepower cannot be empty.')]
@@ -40,9 +36,15 @@ class Engine
     #[Assert\Length(min: 2, max: 50, minMessage: 'Manufacturer name length must be at least {{ limit }} characters long', maxMessage: 'Manufacturer name length must not exceed {{ limit }} characters.')]
     private ?string $Manufacturer = null;
 
-    public function getId(): ?int
+    public function getSerialCode(): ?string
     {
-        return $this->id;
+        return $this->SerialCode;
+    }
+
+    public function setSerialCode(string $SerialCode): static
+    {
+        $this->SerialCode = $SerialCode;
+        return $this;
     }
 
     public function getName(): ?string
@@ -53,19 +55,6 @@ class Engine
     public function setName(string $Name): static
     {
         $this->Name = $Name;
-
-        return $this;
-    }
-
-    public function getSerialCode(): ?string
-    {
-        return $this->SerialCode;
-    }
-
-    public function setSerialCode(string $SerialCode): static
-    {
-        $this->SerialCode = $SerialCode;
-
         return $this;
     }
 
@@ -77,7 +66,6 @@ class Engine
     public function setHorsepower(int $Horsepower): static
     {
         $this->Horsepower = $Horsepower;
-
         return $this;
     }
 
@@ -89,7 +77,6 @@ class Engine
     public function setManufacturer(string $Manufacturer): static
     {
         $this->Manufacturer = $Manufacturer;
-
         return $this;
     }
 }
