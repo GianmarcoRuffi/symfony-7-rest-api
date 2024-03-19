@@ -43,7 +43,7 @@ class EngineController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $name = $request->request->get('name');
-        $serialCode = $request->request->get('serial_code'); // Utilizzare serial_code
+        $serialCode = $request->request->get('serial_code');
         $horsepower = $request->request->get('horsepower');
         $manufacturer = $request->request->get('manufacturer');
 
@@ -55,7 +55,7 @@ class EngineController extends AbstractController
 
         $engine = new Engine();
         $engine->setName($name);
-        $engine->setSerialCode($serialCode); // Utilizzare serial_code
+        $engine->setSerialCode($serialCode);
         $engine->setHorsepower((int)$horsepower);
         $engine->setManufacturer($manufacturer);
 
