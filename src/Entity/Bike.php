@@ -21,7 +21,7 @@ class Bike
     private ?string $Brand = null;
 
 
-    #[ORM\Column(name: "engine_serial",length: 255, nullable: false)]
+    #[ORM\Column(name: 'engine_serial',length: 255, nullable: false)]
     #[Assert\NotBlank(message: 'Engine Serial cannot be empty.')]
     #[Assert\Length(min: 5, max: 50, minMessage: 'Engine Serial length must be at least {{ limit }} characters long', maxMessage: 'Engine Serial length must not exceed {{ limit }} characters.')]
     private ?string $EngineSerial = null;

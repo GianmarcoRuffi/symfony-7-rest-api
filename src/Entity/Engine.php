@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\EngineRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EngineRepository::class)]
 #[ORM\Index(columns: ['serial_code'], name: 'engine_serial_code_idx')]
+#[UniqueEntity(fields: ["SerialCode"], message: 'There is already an engine with this serial code.')]
 
 class Engine
 {
