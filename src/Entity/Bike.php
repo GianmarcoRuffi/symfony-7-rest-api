@@ -15,21 +15,21 @@ class Bike
     private ?int $id = null;
 
 
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: 'Brand cannot be empty.')]
-    #[Assert\Length(min: 2, max: 50, minMessage:'Brand length must be at least {{ limit }} characters long', maxMessage:'Brand length must not exceed {{ limit }} characters.')]
+    #[ORM\Column(length: 50, nullable: false)]
+    #[Assert\NotBlank(message: 'Brand name cannot be empty.')]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Brand name length must be at least {{ limit }} characters long', maxMessage: 'Brand name length must not exceed {{ limit }} characters.')]
     private ?string $Brand = null;
 
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: 'Engine Size cannot be empty.')]
-    #[Assert\Type(type: 'integer', message: 'Engine size must be a number.')]
-    #[Assert\Positive(message: 'Engine Size cannot be negative.')]
-    private ?int $EngineSize = null;
+    #[ORM\ManyToOne(targetEntity: Engine::class)]
+    #[Assert\NotBlank(message: 'You must indicate an existing serial.')]
+    #[ORM\JoinColumn(name: "engine_serial", referencedColumnName: "serial_code")]
+    private $engine;
 
 
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(min: 2, max: 50)]
+    #[ORM\Column(length: 50, nullable: false)]
+    #[Assert\NotBlank(message: 'Color cannot be empty.')]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Color text length must be at least {{ limit }} characters long', maxMessage: 'Color text length must not exceed {{ limit }} characters.')]
     private ?string $Color = null;
 
     public function getId(): ?int
@@ -49,17 +49,18 @@ class Bike
         return $this;
     }
 
-    public function getEngineSize(): ?int
+    public function getEngine(): ?Engine
     {
-        return $this->EngineSize;
+        return $this->engine;
     }
 
-    public function setEngineSize(int $EngineSize): static
+    public function setEngine(?Engine $engine): self
     {
-        $this->EngineSize = $EngineSize;
+        $this->engine = $engine;
 
         return $this;
     }
+
 
     public function getColor(): ?string
     {
