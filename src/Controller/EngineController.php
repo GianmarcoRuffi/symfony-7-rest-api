@@ -9,35 +9,27 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Service\EngineService;
 
 #[Route('/api', name: 'api_')]
 class EngineController extends AbstractController
 {
-    #[Route('/engines', name: 'engine_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): JsonResponse
+    private $engineService;
+
+    public function __construct(EngineService $engineService)
     {
-        try {
-            $engines = $entityManager
-                ->getRepository(Engine::class)
-                ->findAll();
-
-            $data = [];
-
-            foreach ($engines as $engine) {
-                $data[] = [
-                    'id' => $engine->getSerialCode(),
-                    'name' => $engine->getName(),
-                    'serial_code' => $engine->getSerialCode(),
-                    'horsepower' => $engine->getHorsepower(),
-                    'manufacturer' => $engine->getManufacturer(),
-                ];
-            }
-
-            return $this->json($data);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
-        }
+        $this->engineService = $engineService;
     }
+
+
+
+    #[Route('/engines', name: 'engine_index', methods: ['GET'])]
+    public function index(): JsonResponse
+    {
+        return $this->engineService->getAllEngines();
+    }
+
+    
 
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
