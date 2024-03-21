@@ -29,40 +29,22 @@ class EngineController extends AbstractController
         return $this->engineService->getAllEngines();
     }
 
-    
+
 
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $name = $request->request->get('name');
-        $serialCode = $request->request->get('serial_code');
-        $horsepower = $request->request->get('horsepower');
-        $manufacturer = $request->request->get('manufacturer');
+        $data = json_decode($request->getContent(), true);
 
-
-        if ($name === null || $serialCode === null || $horsepower === null || $manufacturer === null) {
+        if (!$data) {
             return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
         }
 
+        $engine = $this->engineService->createEngine($data);
 
-        $engine = new Engine();
-        $engine->setName($name);
-        $engine->setSerialCode($serialCode);
-        $engine->setHorsepower((int)$horsepower);
-        $engine->setManufacturer($manufacturer);
-
-        $errors = $validator->validate($engine);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return $this->json(['errors' => $errorMessages], 400);
+        if (!$engine) {
+            return $this->json(['error' => 'Mandatory fields cannot be null or validation failed.'], 400);
         }
-
-        $entityManager->persist($engine);
-        $entityManager->flush();
 
         return $this->json([
             'id' => $engine->getSerialCode(),
@@ -74,9 +56,9 @@ class EngineController extends AbstractController
     }
 
     #[Route('/engines/{serial_code}', name: 'engine_show', methods: ['GET'])]
-    public function show(EntityManagerInterface $entityManager, string $serial_code): JsonResponse
+    public function show(string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
+        $engine = $this->engineService->getEngineBySerialCode($serial_code);
 
         if (!$engine) {
             return $this->json('No engine found for serial code: ' . $serial_code, 404);
@@ -92,30 +74,19 @@ class EngineController extends AbstractController
     }
 
     #[Route('/engines/{serial_code}', name: 'engine_update', methods: ['PUT', 'PATCH'])]
-    public function update(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, string $serial_code): JsonResponse
+    public function update(Request $request, string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['error' => 'Invalid JSON data.'], 400);
+        }
+
+        $engine = $this->engineService->updateEngine($serial_code, $data);
 
         if (!$engine) {
             return $this->json('No engine found for serial code: ' . $serial_code, 404);
         }
-
-        $engine->setName($request->request->get('name', $engine->getName()));
-        $engine->setSerialCode($request->request->get('serial_code', $engine->getSerialCode()));
-        $engine->setHorsepower((int)$request->request->get('horsepower', $engine->getHorsepower()));
-        $engine->setManufacturer($request->request->get('manufacturer', $engine->getManufacturer()));
-
-        $errors = $validator->validate($engine);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return $this->json(['errors' => $errorMessages], 400);
-        }
-
-        $entityManager->flush();
 
         return $this->json([
             'id' => $engine->getSerialCode(),
@@ -127,16 +98,13 @@ class EngineController extends AbstractController
     }
 
     #[Route('/engines/{serial_code}', name: 'engine_delete', methods: ['DELETE'])]
-    public function delete(EntityManagerInterface $entityManager, string $serial_code): JsonResponse
+    public function delete(string $serial_code): JsonResponse
     {
-        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $serial_code]);
+        $success = $this->engineService->deleteEngine($serial_code);
 
-        if (!$engine) {
+        if (!$success) {
             return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
         }
-
-        $entityManager->remove($engine);
-        $entityManager->flush();
 
         return $this->json('The engine with serial code ' . $serial_code . ' has been successfully deleted');
     }
