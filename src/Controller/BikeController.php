@@ -10,36 +10,23 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Bike;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Service\BikeService;
 
 
 #[Route('/api', name: 'api_')]
 class BikeController extends AbstractController
 {
-    #[Route('/bikes', name: 'bike_index', methods: ['get'])]
-    public function index(EntityManagerInterface $entityManager): JsonResponse
+    private $bikeService;
+
+    public function __construct(BikeService $bikeService)
     {
-        try {
-            $bikes = $entityManager->getRepository(Bike::class)->findAll();
+        $this->bikeService = $bikeService;
+    }
 
-            $data = [];
-            foreach ($bikes as $bike) {
-                $data[] = [
-                    'id' => $bike->getId(),
-                    'brand' => $bike->getBrand(),
-                    'engine' => [
-                        'name' => $bike->getEngine()->getName(),
-                        'serial_code' => $bike->getEngine()->getSerialCode(),
-                        'manufacturer' => $bike->getEngine()->getManufacturer(),
-                        'horsepower' => $bike->getEngine()->getHorsepower(),
-                    ],
-                    'color' => $bike->getColor(),
-                ];
-            }
-
-            return $this->json($data);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
-        }
+    #[Route('/bikes', name: 'bike_index', methods: ['GET'])]
+    public function index(): JsonResponse
+    {
+        return $this->bikeService->getAllBikes();
     }
 
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
