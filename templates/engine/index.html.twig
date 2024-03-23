@@ -1,5 +1,3 @@
-{# templates/engine/index.html.twig #}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +7,6 @@
 <body>
     <h1>Engine CRUD</h1>
 
-    {# Mostra tutti gli engine in una tabella #}
     <table border="1">
         <tr>
             <th>Serial Code</th>
@@ -20,30 +17,27 @@
         </tr>
         {% for engine in engines %}
             <tr>
-                <td>{{ engine.serial_code }}</td>
-                <td>{{ engine.name }}</td>
-                <td>{{ engine.horsepower }}</td>
-                <td>{{ engine.manufacturer }}</td>
+                <td>{{ engine.getSerialCode() }}</td>
+                <td>{{ engine.getName() }}</td>
+                <td>{{ engine.getHorsepower() }}</td>
+                <td>{{ engine.getManufacturer() }}</td>
                 <td>
-                    <a href="{{ path('api_engine_show', {'serial_code': engine.serial_code}) }}">Show</a>
-                    <a href="{{ path('api_engine_update', {'serial_code': engine.serial_code}) }}">Edit</a>
-                    <a href="{{ path('api_engine_delete', {'serial_code': engine.serial_code}) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{{ path('api_engine_show', {'serial_code': engine.getSerialCode()}) }}">Show</a>
                 </td>
             </tr>
         {% endfor %}
     </table>
 
-    {# Modulo per creare un nuovo engine #}
     <h2>Create New Engine</h2>
     <form method="post" action="{{ path('api_engine_create') }}">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+        <input type="text" id="name" name="name"><br><br>
         <label for="serial_code">Serial Code:</label>
-        <input type="text" id="serial_code" name="serial_code" required><br><br>
+        <input type="text" id="serial_code" name="serial_code"><br><br>
         <label for="horsepower">Horsepower:</label>
-        <input type="number" id="horsepower" name="horsepower" required><br><br>
+        <input type="number" id="horsepower" name="horsepower"><br><br>
         <label for="manufacturer">Manufacturer:</label>
-        <input type="text" id="manufacturer" name="manufacturer" required><br><br>
+        <input type="text" id="manufacturer" name="manufacturer"><br><br>
         <button type="submit">Create</button>
     </form>
 </body>

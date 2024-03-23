@@ -13,6 +13,12 @@ class EngineRepository extends ServiceEntityRepository
         parent::__construct($registry, Engine::class);
     }
 
+    public function findAllEngines(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->getQuery()
+            ->getResult();
+    }
 
     public function findOneByName(string $name): ?Engine
     {

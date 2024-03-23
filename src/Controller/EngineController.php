@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\EngineService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\EngineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -26,18 +27,36 @@ class EngineController extends AbstractController
 
 
     #[Route('/engines', name: 'engine_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(EngineRepository $engineRepository): Response
     {
-        $engines = $this->engineService->getAllEngines(); // Assuming this function returns the engines
+        // Utilizza il metodo personalizzato findAllEngines() del repository per ottenere tutti gli Engine
+        $engines = $engineRepository->findAllEngines();
 
-        // Render the 'engine/index.html.twig' template with the 'engines' variable
         return $this->render('engine/index.html.twig', [
             'engines' => $engines,
         ]);
     }
 
+    // #[Route('/engines', name: 'engine_create', methods: ['POST'])]
+    // public function create(Request $request): ?JsonResponse
+    // {
+    //     $data = [
+    //         'name' => $request->request->get('name'),
+    //         'serial_code' => $request->request->get('serial_code'),
+    //         'horsepower' => $request->request->get('horsepower'),
+    //         'manufacturer' => $request->request->get('manufacturer'),
+    //     ];
+
+    //     $response = $this->engineService->createEngine($data);
+    //     $engine = json_decode($response->getContent());
+
+    //     return $this->render('engine/index.html.twig', [
+    //         'engine' => $engine,
+    //     ]);
+    // }
+
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
-    public function create(Request $request): ?JsonResponse
+    public function create(Request $request): ?Response
     {
         $data = [
             'name' => $request->request->get('name'),
@@ -46,25 +65,38 @@ class EngineController extends AbstractController
             'manufacturer' => $request->request->get('manufacturer'),
         ];
 
-        return $this->engineService->createEngine($data);
+        $response = $this->engineService->createEngine($data);
+
+        // Controlliamo se la creazione è avvenuta con successo
+        if ($response->getStatusCode() === JsonResponse::HTTP_CREATED) {
+            // Estraiamo il serial code del motore creato
+            $engineData = $response->getContent();
+            $engineDataArray = json_decode($engineData, true);
+            $serialCode = $engineDataArray['serial_code'];
+
+            // Reindirizziamo l'utente alla pagina di visualizzazione del motore appena creato
+            return $this->redirectToRoute('api_engine_show', ['serial_code' => $serialCode]);
+        }
+
+        // Se ci sono stati errori durante la creazione, restituisci semplicemente la risposta
+        return $response;
     }
 
 
+
+
     #[Route('/engines/{serial_code}', name: 'engine_show', methods: ['GET'])]
-    public function show(string $serial_code): JsonResponse
+    public function show(string $serial_code): Response
+
     {
         $engine = $this->engineService->getEngineBySerialCode($serial_code);
 
         if (!$engine) {
-            return $this->json('No engine found for serial code: ' . $serial_code, 404);
+            throw $this->createNotFoundException('No engine found for serial code: ' . $serial_code);
         }
 
-        return $this->json([
-            'id' => $engine->getSerialCode(),
-            'name' => $engine->getName(),
-            'serial_code' => $engine->getSerialCode(),
-            'horsepower' => $engine->getHorsepower(),
-            'manufacturer' => $engine->getManufacturer(),
+        return $this->render('engine/engine_show.html.twig', [
+            'engine' => $engine,
         ]);
     }
 
