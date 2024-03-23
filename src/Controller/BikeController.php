@@ -30,49 +30,9 @@ class BikeController extends AbstractController
     }
 
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
-    public function create(EntityManagerInterface $entityManager, Request $request, ValidatorInterface $validator): JsonResponse
+    public function create(): JsonResponse
     {
-        $brand = $request->request->get('brand');
-        $color = $request->request->get('color');
-        $engineSerial = $request->request->get('engine_serial');
-
-        if ($brand === null || $color === null || $engineSerial === null) {
-            return $this->json(['error' => 'Mandatory fields cannot be null.'], 400);
-        }
-
-        $engine = $entityManager->getRepository(Engine::class)->findOneBy(['SerialCode' => $engineSerial]);
-
-        $bike = new Bike();
-        $bike->setBrand($brand);
-        $bike->setColor($color);
-        $bike->setEngine($engine);
-
-        $errors = $validator->validate($bike);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return $this->json(['errors' => $errorMessages], 400);
-        }
-
-        $entityManager->persist($bike);
-        $entityManager->flush();
-
-        $data = [
-            'id' => $bike->getId(),
-            'brand' => $bike->getBrand(),
-            'engine' => [
-                'name' => $bike->getEngine()->getName(),
-                'serial_code' => $bike->getEngine()->getSerialCode(),
-                'manufacturer' => $bike->getEngine()->getManufacturer(),
-                'horsepower' => $bike->getEngine()->getHorsepower(),
-            ],
-            'color' => $bike->getColor(),
-        ];
-
-        return $this->json($data);
+        return $this->bikeService->createBike();
     }
 
 
