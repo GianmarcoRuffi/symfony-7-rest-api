@@ -43,16 +43,15 @@ class EngineService
         }
     }
 
-
-    public function createEngine(array $data): ?Engine
+    public function createEngine(array $data): ?JsonResponse
     {
-        $name = $data['name'] ?? null;
-        $serialCode = $data['serial_code'] ?? null;
-        $horsepower = $data['horsepower'] ?? null;
-        $manufacturer = $data['manufacturer'] ?? null;
+        $name = $data['name'];
+        $serialCode = $data['serial_code'];
+        $horsepower = $data['horsepower'];
+        $manufacturer = $data['manufacturer'];
 
         if ($name === null || $serialCode === null || $horsepower === null || $manufacturer === null) {
-            return null;
+            return new JsonResponse(['error' => 'Mandatory fields cannot be null.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $engine = new Engine();
@@ -64,14 +63,27 @@ class EngineService
         $errors = $this->validator->validate($engine);
 
         if (count($errors) > 0) {
-            return null;
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $this->entityManager->persist($engine);
         $this->entityManager->flush();
 
-        return $engine;
+        $responseData = [
+            'id' => $engine->getSerialCode(),
+            'name' => $engine->getName(),
+            'serial_code' => $engine->getSerialCode(),
+            'horsepower' => $engine->getHorsepower(),
+            'manufacturer' => $engine->getManufacturer(),
+        ];
+
+        return new JsonResponse($responseData, JsonResponse::HTTP_CREATED);
     }
+
 
     public function getEngineBySerialCode(string $serialCode): ?Engine
     {
@@ -106,14 +118,18 @@ class EngineService
         $errors = $this->validator->validate($engine);
 
         if (count($errors) > 0) {
-
-            return null;
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            throw new \RuntimeException(json_encode(['errors' => $errorMessages], 400));
         }
 
         $this->entityManager->flush();
 
         return $engine;
     }
+
 
 
     public function deleteEngine(string $serialCode): bool
