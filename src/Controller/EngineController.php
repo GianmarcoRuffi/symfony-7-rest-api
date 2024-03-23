@@ -5,11 +5,13 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\EngineService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use App\Service\EngineService;
+
 
 #[Route('/api', name: 'api_')]
 class EngineController extends AbstractController
@@ -24,9 +26,14 @@ class EngineController extends AbstractController
 
 
     #[Route('/engines', name: 'engine_index', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function index(): Response
     {
-        return $this->engineService->getAllEngines();
+        $engines = $this->engineService->getAllEngines(); // Assuming this function returns the engines
+
+        // Render the 'engine/index.html.twig' template with the 'engines' variable
+        return $this->render('engine/index.html.twig', [
+            'engines' => $engines,
+        ]);
     }
 
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
