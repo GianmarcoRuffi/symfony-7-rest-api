@@ -6,14 +6,6 @@ use App\Entity\Engine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Engine>
- *
- * @method Engine|null find($id, $lockMode = null, $lockVersion = null)
- * @method Engine|null findOneBy(array $criteria, array $orderBy = null)
- * @method Engine[]    findAll()
- * @method Engine[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class EngineRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,28 +13,46 @@ class EngineRepository extends ServiceEntityRepository
         parent::__construct($registry, Engine::class);
     }
 
-    //    /**
-    //     * @return Engine[] Returns an array of Engine objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAllEngines(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Engine
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneByName(string $name): ?Engine
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOneBySerialCode(string $serialCode): ?Engine
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.serialCode = :serialCode')
+            ->setParameter('serialCode', $serialCode)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findAllByManufacturer(string $manufacturer): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.manufacturer = :manufacturer')
+            ->setParameter('manufacturer', $manufacturer)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithHorsepowerGreaterThan(int $horsepower): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.horsepower > :horsepower')
+            ->setParameter('horsepower', $horsepower)
+            ->getQuery()
+            ->getResult();
+    }
 }

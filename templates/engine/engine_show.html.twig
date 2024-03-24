@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Engine Details</title>
+</head>
+<body>
+    <h1>Engine Details</h1>
+
+    <p><strong>Serial Code / ID:</strong> {{ engine.getSerialCode}}</p>
+    <p><strong>Name:</strong> {{ engine.getName }}</p>
+    <p><strong>Horsepower:</strong> {{ engine.getHorsepower}}</p>
+    <p><strong>Manufacturer:</strong> {{ engine.getManufacturer }}</p>
+
+    <form action="{{ path('api_engine_index') }}" method="get">
+        <button type="submit">All Engines</button>
+    </form>
+<br>
+    <form action="{{ path('api_engine_update', {'serial_code': engine.getSerialCode}) }}" method="put">
+        <button type="submit">Update Engine</button>
+    </form>
+<br>
+    <form action="{{ path('api_engine_delete', {'serial_code': engine.getSerialCode}) }}" method="delete" onsubmit="return confirm('Are you sure you want to delete this engine?');">
+        <button type="submit">Delete Engine</button>
+    </form>
+</body>
+</html>

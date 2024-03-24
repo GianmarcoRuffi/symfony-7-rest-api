@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Motorbikes List{% endblock %}
+
+{% block body %}
+    <div style="display: flex;">
+        <div style="margin-right: 20px;">
+            <h1>Motorbikes List</h1>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Brand</th>
+                        <th>Engine</th>
+                        <th>Color</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bike in bikes %}
+                        <tr>
+                            <td>{{ bike.id }}</td>
+                            <td>{{ bike.brand }}</td>
+                            <td>
+                                Name: {{ bike.engine.name }} <br>
+                                <strong>Serial Code: {{ bike.engine.serial_code }}</strong> <br>
+                                Manufacturer: {{ bike.engine.manufacturer }} <br>
+                                Horsepower: {{ bike.engine.horsepower }}
+                            </td>
+                            <td>{{ bike.color }}</td>
+                              <td>
+                    <a href="{{ path('api_bike_show', {'id': bike.id}) }}">Show</a>
+                </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h2>Create New Bike</h2>
+            <form method="post" action="{{ path('api_bike_create') }}">
+                <label for="brand">Brand:</label>
+                <input type="text" id="brand" name="brand"><br><br>
+                <label for="engine_serial">Engine Serial Code:</label>
+                <input type="text" id="engine_serial" name="engine_serial"><br><br>
+                <label for="color">Color:</label>
+                <input type="text" id="color" name="color"><br><br>
+                <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
