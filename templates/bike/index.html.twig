@@ -1,0 +1,36 @@
+{# templates/bike/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Motorbikes List{% endblock %}
+
+{% block body %}
+    <h1>Motorbikes List</h1>
+
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Engine</th>
+                <th>Color</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bike in bikes %}
+                <tr>
+                    <td>{{ bike.id }}</td>
+                    <td>{{ bike.brand }}</td>
+                    <td>
+                        Name: {{ bike.engine.name }} <br>
+                        <strong>Serial Code: {{ bike.engine.serial_code }}</strong> <br>
+                        Manufacturer: {{ bike.engine.manufacturer }} <br>
+                        Horsepower: {{ bike.engine.horsepower }}
+                    </td>
+                    <td>{{ bike.color }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -24,12 +24,16 @@ class BikeController extends AbstractController
     {
         $this->bikeService = $bikeService;
     }
+    
 
     #[Route('/bikes', name: 'bike_index', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function index(): Response
     {
-        return $this->bikeService->getAllBikes();
+        $bikesData = $this->bikeService->getAllBikes();
+    
+        return $this->render('bike/index.html.twig', ['bikes' => $bikesData]);
     }
+
 
     #[Route('/bikes', name: 'bike_create', methods: ['post'])]
     public function create(): JsonResponse
