@@ -25,5 +25,13 @@ services:
       $twig: "@twig"
     tags:
       - { name: kernel.event_listener, event: kernel.exception }
+
+  # App\EventListener\AuthorizationListener:
+  #   tags:
+  #     - { name: kernel.event_listener, event: kernel.request }
+
+  Symfony\Component\Security\Core\Security:
+    public: true
+
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
