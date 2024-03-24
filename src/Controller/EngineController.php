@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\EngineRepository;
 use Twig\Environment;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Engine;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 #[Route('/api', name: 'api_')]
@@ -49,18 +46,14 @@ class EngineController extends AbstractController
 
         $response = $this->engineService->createEngine($data);
 
-        // Controlliamo se la creazione è avvenuta con successo
         if ($response->getStatusCode() === JsonResponse::HTTP_CREATED) {
-            // Estraiamo il serial code del motore creato
             $engineData = $response->getContent();
             $engineDataArray = json_decode($engineData, true);
             $serialCode = $engineDataArray['serial_code'];
 
-            // Reindirizziamo l'utente alla pagina di visualizzazione del motore appena creato
             return $this->redirectToRoute('api_engine_show', ['serial_code' => $serialCode]);
         }
 
-        // Se ci sono stati errori durante la creazione, restituisci semplicemente la risposta
         return $response;
     }
 
