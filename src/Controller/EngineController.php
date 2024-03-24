@@ -29,7 +29,6 @@ class EngineController extends AbstractController
     #[Route('/engines', name: 'engine_index', methods: ['GET'])]
     public function index(EngineRepository $engineRepository): Response
     {
-        // Utilizza il metodo personalizzato findAllEngines() del repository per ottenere tutti gli Engine
         $engines = $engineRepository->findAllEngines();
 
         return $this->render('engine/index.html.twig', [
