@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bike Details</title>
+</head>
+<body>
+    <h1>Bike Details</h1>
+
+    <p><strong>ID:</strong> {{ bike.id }}</p>
+    <p><strong>Brand:</strong> {{ bike.brand }}</p>
+    <p><strong>Engine Serial Code:</strong> {{ bike.engine.serial_code }}</p>
+    <p><strong>Color:</strong> {{ bike.color }}</p>
+
+    <form action="{{ path('api_bike_index') }}" method="get">
+        <button type="submit">All Bikes</button>
+    </form>
+    <br>
+    <form action="{{ path('api_bike_update', {'id': bike.id}) }}" method="post">
+        <button type="submit">Update Bike</button>
+    </form>
+    <br>
+    <form action="{{ path('api_bike_delete', {'id': bike.id}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this bike?');">
+        <button type="submit">Delete Bike</button>
+    </form>
+</body>
+</html>
