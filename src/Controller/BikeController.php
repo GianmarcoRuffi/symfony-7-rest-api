@@ -11,6 +11,8 @@ use App\Entity\Bike;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Service\BikeService;
+use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 
 #[Route('/api', name: 'api_')]
@@ -37,9 +39,16 @@ class BikeController extends AbstractController
 
 
     #[Route('/bikes/{id}', name: 'bike_show', methods: ['GET'])]
-    public function show(int $id): ?JsonResponse
+    public function show(int $id, BikeService $bikeService, Environment $twig): Response
     {
-        return $this->bikeService->getBikeById($id);
+        $bikeData = $bikeService->getBikeById($id);
+
+        if (!$bikeData) {
+            $content = $twig->render('errors/error404.html.twig');
+            return new Response($content, Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($bikeData);
     }
 
 
