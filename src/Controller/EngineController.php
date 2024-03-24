@@ -9,6 +9,7 @@ use App\Service\EngineService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\EngineRepository;
+use Twig\Environment;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Engine;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -35,24 +36,6 @@ class EngineController extends AbstractController
             'engines' => $engines,
         ]);
     }
-
-    // #[Route('/engines', name: 'engine_create', methods: ['POST'])]
-    // public function create(Request $request): ?JsonResponse
-    // {
-    //     $data = [
-    //         'name' => $request->request->get('name'),
-    //         'serial_code' => $request->request->get('serial_code'),
-    //         'horsepower' => $request->request->get('horsepower'),
-    //         'manufacturer' => $request->request->get('manufacturer'),
-    //     ];
-
-    //     $response = $this->engineService->createEngine($data);
-    //     $engine = json_decode($response->getContent());
-
-    //     return $this->render('engine/index.html.twig', [
-    //         'engine' => $engine,
-    //     ]);
-    // }
 
     #[Route('/engines', name: 'engine_create', methods: ['POST'])]
     public function create(Request $request): ?Response
@@ -85,13 +68,14 @@ class EngineController extends AbstractController
 
 
     #[Route('/engines/{serial_code}', name: 'engine_show', methods: ['GET'])]
-    public function show(string $serial_code): Response
+    public function show(string $serial_code, Environment $twig): Response
 
     {
         $engine = $this->engineService->getEngineBySerialCode($serial_code);
 
         if (!$engine) {
-            throw $this->createNotFoundException('No engine found for serial code: ' . $serial_code);
+            $content = $twig->render('errors/error404.html.twig');
+            return new Response($content, Response::HTTP_NOT_FOUND);
         }
 
         return $this->render('engine/engine_show.html.twig', [
