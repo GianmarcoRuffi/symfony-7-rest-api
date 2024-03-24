@@ -24,13 +24,13 @@ class BikeController extends AbstractController
     {
         $this->bikeService = $bikeService;
     }
-    
+
 
     #[Route('/bikes', name: 'bike_index', methods: ['GET'])]
     public function index(): Response
     {
         $bikesData = $this->bikeService->getAllBikes();
-    
+
         return $this->render('bike/index.html.twig', ['bikes' => $bikesData]);
     }
 
@@ -43,17 +43,19 @@ class BikeController extends AbstractController
 
 
     #[Route('/bikes/{id}', name: 'bike_show', methods: ['GET'])]
-    public function show(int $id, BikeService $bikeService, Environment $twig): Response
+    public function show(int $id, BikeService $bikeService): Response
     {
         $bikeData = $bikeService->getBikeById($id);
 
         if (!$bikeData) {
-            $content = $twig->render('errors/error404.html.twig');
-            return new Response($content, Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Bike not found');
         }
 
-        return $this->json($bikeData);
+        return $this->render('bike/bike_show.html.twig', [
+            'bike' => $bikeData,
+        ]);
     }
+
 
 
     #[Route('/bikes/{id}', name: 'bike_update', methods: ['put', 'patch'])]
